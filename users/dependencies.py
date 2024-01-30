@@ -43,6 +43,6 @@ async def get_current_user(token: Annotated[str, Depends(get_token)]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     return ProfileUser(
         id=data.id,
-        username=data.password,
+        username=data.username,
         email=data.email
     )
