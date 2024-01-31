@@ -11,6 +11,7 @@ class City(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
     resumes: Mapped[list['Resume']] = relationship(back_populates='cities', secondary='cities_resumes')
+    companies: Mapped[list["Company"]] = relationship(back_populates='city')
 
     def __repr__(self) -> str:
         return self.name
