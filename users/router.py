@@ -46,6 +46,6 @@ async def login_user(user: UserLogin):
 
 @router.get('/profile')
 async def get_profile(
-    user: Annotated[str, Depends(get_current_user)]
+    user: Annotated[ProfileUser, Depends(get_current_user)]
 ):
     return user

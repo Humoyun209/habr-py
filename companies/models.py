@@ -8,9 +8,11 @@ class Company(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
-    about_company: Mapped[str]
+    about_company: Mapped[str | None]
     phone: Mapped[str]
-    url_company: Mapped[str | None]
+    url: Mapped[str]
+    email: Mapped[str | None]
+    photo: Mapped[str | None]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     city_id: Mapped[int | None] = mapped_column(ForeignKey('city.id', ondelete='SET NULL'))
     city: Mapped["City"] = relationship(back_populates='companies')

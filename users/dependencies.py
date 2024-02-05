@@ -20,7 +20,7 @@ def get_token(request: Request):
     return access_token
 
 
-async def get_current_user(token: Annotated[str, Depends(get_token)]):
+async def get_current_user(token: Annotated[str, Depends(get_token)]) -> ProfileUser:
     try:
         payload = jwt.decode(
             token=token,
