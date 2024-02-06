@@ -36,5 +36,5 @@ app.add_middleware(
 
 
 @app.get("/")
-def get_home():
-    return {'Message': 'Welcome to Full Stack'}
+def get_home(name: Annotated[str | None, Query()]):
+    return {'Message': f'Welcome to Full Stack - {name}'}
