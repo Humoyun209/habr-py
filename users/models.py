@@ -2,6 +2,7 @@ from decimal import Decimal
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from app.database import Base
+from app.users.enums import Level, WorkLoad
 
 
 class User(Base):
@@ -39,11 +40,8 @@ class Resume(Base):
     about: Mapped[str]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     salary: Mapped[Decimal | None]
-   
-    workloads: Mapped[list["WorkLoad"]] = relationship(
-        back_populates="resumes",
-        secondary="workloads_resumes"
-    )
+    workload: Mapped[WorkLoad]
+    level: Mapped[Level]
     cities: Mapped[list['City']] = relationship(back_populates="resumes", secondary="cities_resumes")
     user: Mapped["User"] = relationship(back_populates="resumes")
     tags: Mapped[list["Tag"]] = relationship(back_populates="resumes", secondary="tags_resumes")
@@ -54,19 +52,6 @@ class Resume(Base):
     
     def __repr__(self) -> str:
         return f'Resume by {self.first_name} {self.last_name}'
-    
-
-class WorkloadsResumes(Base):
-    __tablename__ = "workloads_resumes"
-    
-    workload_id: Mapped[int] = mapped_column(
-        ForeignKey('workload.id', ondelete='CASCADE'),
-        primary_key=True
-    )
-    resume_id: Mapped[int] = mapped_column(
-        ForeignKey('resume.id', ondelete='CASCADE'),
-        primary_key=True
-    )
 
 
 class TagsResumes(Base):

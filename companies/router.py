@@ -43,7 +43,7 @@ async def create_company(
     async with aiofiles.open(logo_path, "wb") as f:
         await f.write(logo.file.read())
     new_company_data = {
-        "photo": logo_path,
+        "logo": logo_path,
         "name": name,
         "url": str(url),
         "city_id": city_id,

@@ -1,5 +1,6 @@
 from app.base_dao import BaseDAO
 from app.companies.models import Company
+from app.users.models import User
 from app.vacancies.models import City
 from app.database import async_session_maker
 from sqlalchemy import select, insert, delete, update
@@ -17,13 +18,10 @@ class CompanyDAO(BaseDAO):
             query = (
                 select(Company)
                 .where(Company.id == company_id)
-                .options(joinedload(Company.owner))
+                .options(joinedload(Company.owner).defer(User.password))
                 .options(joinedload(Company.city))
-                .options(selectinload(Company.followers))
+                .options(selectinload(Company.followers).defer(User.password))
                 .options(selectinload(Company.vacancies))
             )
             result = await session.execute(query)
-            try:
-                return result.scalars().one()
-            except Exception:
-                return None
+            return result.scalars().first()

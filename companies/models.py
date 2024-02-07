@@ -12,7 +12,8 @@ class Company(Base):
     phone: Mapped[str]
     url: Mapped[str]
     email: Mapped[str | None]
-    photo: Mapped[str | None]
+    logo: Mapped[str | None]
+    banner: Mapped[str | None]
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     city_id: Mapped[int | None] = mapped_column(ForeignKey('city.id', ondelete='SET NULL'))
     city: Mapped["City"] = relationship(back_populates='companies')
@@ -22,6 +23,7 @@ class Company(Base):
         back_populates='followed_companies', 
         secondary='companies_followers'
     )
+    tags: Mapped[list["Tag"]] = relationship(back_populates='companies', secondary='tags_companies')
     
     def __repr__(self) -> str:
         return self.name
@@ -40,19 +42,8 @@ class CompaniesFollowers(Base):
     )
     
 
-class WorkLoad(Base):
-    __tablename__ = 'workload'
+class TagsCmpanies(Base):
+    __tablename__ = 'tags_companies'
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    work_load: Mapped[str] = mapped_column(String(100))
-    resumes: Mapped[list["Resume"]] = relationship(
-        back_populates="workloads",
-        secondary="workloads_resumes"
-    )
-    vacancies: Mapped[list["Vacancy"]] = relationship(
-        back_populates="workloads",
-        secondary="workloads_vacancies"
-    )
-    
-    def __repr__(self) -> str:
-        return f'Условие - {self.work_load}'
+    tag_id: Mapped[int] = mapped_column(ForeignKey('tag.id'), primary_key=True)
+    company_id: Mapped[int] = mapped_column(ForeignKey('company.id'), primary_key=True)
