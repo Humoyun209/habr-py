@@ -2,11 +2,17 @@ from datetime import datetime
 from typing import Annotated
 from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError, jwt
+from app.companies.dao import CompanyDAO
 from app.users.dao import UserDAO
 
 from app.config import get_secret
 from app.users.models import User
 from app.users.schemas import ProfileUser
+
+
+async def check_owner_company(user_id, company_id):
+    company_ids = await CompanyDAO.company_ids(user_id)
+    return company_id in company_ids
 
 
 def get_token(request: Request):
@@ -46,3 +52,11 @@ async def get_current_user(token: Annotated[str, Depends(get_token)]) -> Profile
         username=data.username,
         email=data.email
     )
+    
+
+async def is_company_owner(request: Request):
+    token = request.headers.get('Authorization')
+    try:
+        key, access_token = token.split()
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

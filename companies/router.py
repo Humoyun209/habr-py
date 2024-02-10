@@ -3,15 +3,16 @@ import uuid
 import aiofiles
 from click import File
 
-from fastapi import APIRouter, Depends, Form, Path, UploadFile
+from fastapi import APIRouter, Depends, Form, Path, Request, Response, UploadFile
 from pydantic import BaseModel, HttpUrl, EmailStr
 
 from app.companies.dao import CityDAO, CompanyDAO
 from app.companies.models import Company
+from app.users.dao import UserDAO
 from app.users.dependencies import get_current_user
 from app.users.schemas import ProfileUser
 from app.vacancies.models import City
-from app.users.models import Resume
+from app.users.models import Resume, User
 
 
 router = APIRouter(prefix="/company", tags=["Компании"])
@@ -62,8 +63,26 @@ async def get_cities():
     return result
 
 
-
 @router.get('/{company_id}', status_code=200)
-async def get_company(company_id: Annotated[int, Path()]):
+async def get_company(
+    company_id: Annotated[int, Path()], 
+    request: Request
+):
+    token = request.headers.get('Authorization')
+    user = await get_current_user(token=token) if token else None
     result = await CompanyDAO.get_company_with_all_data(company_id)
-    return result
+    return {
+        'company': result,
+        'is_owner': bool(user)
+    }
+    
+
+@router.get('/check_owner_company/{company_id}', status_code=200)
+async def check_owner_company(
+    company_id: int,
+    user: Annotated[ProfileUser, Depends(get_current_user)]
+) -> dict[str, bool]:
+    user: User = await UserDAO.get_user(user.username)
+    return {
+        'is_owner': company_id in user.companies
+    }

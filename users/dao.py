@@ -1,6 +1,7 @@
 import asyncio
 from app.database import async_session_maker
 from sqlalchemy import insert, or_, select
+from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.exc import IntegrityError
 from app.users.models import User
 from app.vacancies.models import Vacancy
@@ -18,6 +19,7 @@ class UserDAO:
         async with async_session_maker() as session:
             user = await session.execute(
                 select(User).where(User.username == username)
+                .options(selectinload(User.companies))
             )
             return user.scalars().first()
     

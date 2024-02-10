@@ -1,5 +1,6 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.companies.dao import CompanyDAO
 
 from app.users.dao import UserDAO
 from app.users.auth import authenticate_user, create_access_token

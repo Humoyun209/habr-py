@@ -37,11 +37,10 @@ class Vacancy(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(255))
-    min_salary: Mapped[Decimal]
+    min_salary: Mapped[Decimal | None]
     max_salary: Mapped[Decimal | None]
-    about_company: Mapped[str | None]
-    candidate_expectation: Mapped[str | None]
-    working_conditions: Mapped[str | None]
+    expectation: Mapped[str | None]
+    conditions: Mapped[str | None]
     bonuses: Mapped[str | None]
     created: Mapped[datetime] = mapped_column(server_default=text("TIMEZONE('utc', now())"))
     workload: Mapped[WorkLoad]

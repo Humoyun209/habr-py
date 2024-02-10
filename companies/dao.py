@@ -13,7 +13,7 @@ class CityDAO(BaseDAO):
 
 class CompanyDAO(BaseDAO):
     @classmethod
-    async def get_company_with_all_data(cls, company_id: int):
+    async def get_company_with_all_data(cls, company_id: int) -> Company:
         async with async_session_maker() as session:
             query = (
                 select(Company)
@@ -25,3 +25,10 @@ class CompanyDAO(BaseDAO):
             )
             result = await session.execute(query)
             return result.scalars().first()
+    
+    @classmethod
+    async def company_ids(cls, user_id):
+        async with async_session_maker() as session:
+            query = select(Company.id).where(Company.user_id == user_id)
+            result = await session.execute(query)
+            return result.fetchall()
