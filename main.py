@@ -6,6 +6,7 @@ from sqladmin import Admin
 from app.admin.admin import CityAdmin, CompanyAdmin, ResumeAdmin, UserAdmin, VacancyAdmin
 from app.users.router import router as user_router
 from app.companies.router import router as company_router
+from app.vacancies.router import router as vacancy_router
 from app.database import engine
 from app.admin.auth import authentication_backend
 
@@ -19,6 +20,7 @@ admin.add_view(ResumeAdmin)
 
 app.include_router(user_router)
 app.include_router(company_router)
+app.include_router(vacancy_router)
 app.mount('/images', StaticFiles(directory='./images'), 'static')
 
 origins = [

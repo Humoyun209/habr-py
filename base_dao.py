@@ -17,3 +17,13 @@ class BaseDAO:
             )
             await session.commit()
             return result.scalars().one()
+    
+    @classmethod
+    async def get(cls, model, model_id):
+        print(model_id)
+        async with async_session_maker() as session:
+            result = await session.execute(
+                select(model).where(model.id ==  model_id)
+            )
+            return result.scalars().first()
+            

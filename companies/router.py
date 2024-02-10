@@ -73,7 +73,7 @@ async def get_company(
     result = await CompanyDAO.get_company_with_all_data(company_id)
     return {
         'company': result,
-        'is_owner': bool(user)
+        'is_owner': result.owner.username == user.username if user else False
     }
     
 
@@ -84,5 +84,5 @@ async def check_owner_company(
 ) -> dict[str, bool]:
     user: User = await UserDAO.get_user(user.username)
     return {
-        'is_owner': company_id in user.companies
+        'is_owner': company_id in [c.id for c in user.companies]
     }

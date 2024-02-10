@@ -52,11 +52,3 @@ async def get_current_user(token: Annotated[str, Depends(get_token)]) -> Profile
         username=data.username,
         email=data.email
     )
-    
-
-async def is_company_owner(request: Request):
-    token = request.headers.get('Authorization')
-    try:
-        key, access_token = token.split()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
