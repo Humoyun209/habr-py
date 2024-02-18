@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: fbbfc760156f
+Revision ID: a46ba5625b1a
 Revises: 
-Create Date: 2024-02-07 21:08:48.483352
+Create Date: 2024-02-18 21:50:35.373176
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'fbbfc760156f'
+revision: str = 'a46ba5625b1a'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -57,14 +57,21 @@ def upgrade() -> None:
     )
     op.create_table('resume',
     sa.Column('id', sa.String(), nullable=False),
-    sa.Column('photo', sa.String(), nullable=False),
+    sa.Column('photo', sa.String(), nullable=True),
     sa.Column('first_name', sa.String(length=50), nullable=False),
     sa.Column('last_name', sa.String(length=50), nullable=False),
+    sa.Column('phone', sa.String(length=16), nullable=False),
     sa.Column('about', sa.String(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('experience', sa.String(), nullable=True),
     sa.Column('salary', sa.Numeric(), nullable=True),
+    sa.Column('connect_link', sa.String(), nullable=True),
+    sa.Column('connect_type', sa.Enum('LINKEDIN', 'TELEGRAM', 'VK', 'FACEBOOK', name='connecttype'), nullable=True),
     sa.Column('workload', sa.Enum('FULL_TIME', 'PART_TIME', name='workload'), nullable=False),
     sa.Column('level', sa.Enum('INTERN', 'JUNIOR', 'MIDDLE', 'SENIOR', 'LEAD', name='level'), nullable=False),
+    sa.Column('birthday', sa.DateTime(), nullable=True),
+    sa.Column('sex', sa.Integer(), nullable=False),
+    sa.Column('is_remote', sa.Boolean(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -99,11 +106,10 @@ def upgrade() -> None:
     op.create_table('vacancy',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
-    sa.Column('min_salary', sa.Numeric(), nullable=False),
+    sa.Column('min_salary', sa.Numeric(), nullable=True),
     sa.Column('max_salary', sa.Numeric(), nullable=True),
-    sa.Column('about_company', sa.String(), nullable=True),
-    sa.Column('candidate_expectation', sa.String(), nullable=True),
-    sa.Column('working_conditions', sa.String(), nullable=True),
+    sa.Column('expectation', sa.String(), nullable=True),
+    sa.Column('conditions', sa.String(), nullable=True),
     sa.Column('bonuses', sa.String(), nullable=True),
     sa.Column('created', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
     sa.Column('workload', sa.Enum('FULL_TIME', 'PART_TIME', name='workload'), nullable=False),

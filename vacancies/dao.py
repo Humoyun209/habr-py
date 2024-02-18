@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload, joinedload
 from app.base_dao import BaseDAO
 from app.companies.models import Company
 from app.database import async_session_maker
-from app.vacancies.models import Tag, Vacancy, TagsVacancies
+from app.vacancies.models import Responses, Tag, Vacancy, TagsVacancies
 
 
 class VacancyDAO(BaseDAO):
@@ -65,3 +65,20 @@ class VacancyDAO(BaseDAO):
                 )
             await session.commit()
             return True
+
+
+class ResponseDAO:
+    @classmethod
+    async def create_response(
+        cls, user_id: int, vacancy_id: int, cover_letter: str | None = None
+    ):
+        async with async_session_maker() as session:
+            response = await session.execute(
+                insert(Responses)
+                .values(
+                    user_id=user_id, vacancy_id=vacancy_id, cover_letter=cover_letter
+                )
+                .returning(Responses)
+            )
+            await session.commit()
+            return response
