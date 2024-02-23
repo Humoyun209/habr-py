@@ -1,11 +1,27 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException, status
+import json
+import secrets
+from typing import Annotated, Any
+import uuid
+from fastapi import (
+    APIRouter,
+    Cookie,
+    Depends,
+    Form,
+    HTTPException,
+    Header,
+    Path,
+    Request,
+    Response,
+    status,
+)
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from app.companies.dao import CompanyDAO
 
-from app.users.dao import UserDAO
+from app.users.dao import ResumeDAO, UserDAO
 from app.users.auth import authenticate_user, create_access_token
 from app.users.dependencies import get_current_user
-from app.users.schemas import UserLogin, UserScheme, ProfileUser
+from app.users.models import Resume
+from app.users.schemas import BaseResume, UserLogin, UserScheme, ProfileUser
 from passlib.hash import pbkdf2_sha256
 
 router = APIRouter(prefix="/users", tags=["Пользователи"])
@@ -51,3 +67,28 @@ async def login_user(user: UserLogin):
 async def get_profile(user: Annotated[ProfileUser, Depends(get_current_user)]):
     full_user = await UserDAO.get_full_data_user(user.id)
     return full_user
+
+
+@router.post("/resume/create")
+async def create_resume(
+    user: Annotated[ProfileUser, Depends(get_current_user)], base_resume: BaseResume
+):
+    data = base_resume.model_dump() | {"user_id": user.id}
+    resume = await ResumeDAO.create_resume(**data)
+    return resume
+
+
+@router.get("/resume/{resume_id}", status_code=200)
+async def get_resume(
+    user: Annotated[ProfileUser, Depends(get_current_user)],
+    resume_id: Annotated[int, Path()],
+):
+    resume = await ResumeDAO.get(Resume, resume_id)
+    return resume
+
+
+@router.patch("/resume/edit", status_code=204)
+async def resume_edit(
+    resume_data: ResumeSchema,
+    Annotated
+)

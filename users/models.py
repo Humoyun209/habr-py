@@ -29,7 +29,7 @@ class User(Base):
 class Resume(Base):
     __tablename__ = "resume"
 
-    id: Mapped[str] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
     photo: Mapped[str | None]
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50))
@@ -39,8 +39,8 @@ class Resume(Base):
     salary: Mapped[Decimal | None]
     connect_link: Mapped[str | None]
     connect_type: Mapped[ConnectType | None]
-    workload: Mapped[WorkLoad]
-    level: Mapped[Level]
+    workload: Mapped[WorkLoad | None]
+    level: Mapped[Level | None]
     birthday: Mapped[datetime | None]
     sex: Mapped[int] = mapped_column(default=0)
     is_remote: Mapped[bool] = mapped_column(default=False)
@@ -48,9 +48,7 @@ class Resume(Base):
     cities: Mapped[list["City"]] = relationship(
         back_populates="resumes", secondary="cities_resumes"
     )
-    user: Mapped["User"] = relationship(
-        back_populates="resume",
-    )
+    user: Mapped["User"] = relationship(back_populates="resume", uselist=False)
     tags: Mapped[list["Tag"]] = relationship(
         back_populates="resumes", secondary="tags_resumes"
     )

@@ -1,11 +1,14 @@
 import asyncio
+from app.base_dao import BaseDAO
 from app.database import async_session_maker
 from sqlalchemy import insert, or_, select
-from sqlalchemy.orm import selectinload, joinedload, deferred, defer
+from sqlalchemy.orm import selectinload, joinedload, deferred, defer, load_only
 from sqlalchemy.exc import IntegrityError
-from app.users.models import User
+from app.users.models import Resume, User
+from app.users.schemas import UserLogin
 from app.vacancies.models import Vacancy
 from app.companies.models import Company
+from sqlalchemy import case, func
 
 
 class UserDAO:
@@ -16,10 +19,21 @@ class UserDAO:
             return users.fetchall()
 
     @classmethod
+    async def get_username_and_pass(cls, username: str):
+        async with async_session_maker() as session:
+            user = await session.execute(
+                select(User)
+                .options(load_only(User.username, User.password))
+                .where(User.username == username)
+            )
+            return user.scalars().first()
+
+    @classmethod
     async def get_user(cls, username):
         async with async_session_maker() as session:
             user = await session.execute(
                 select(User)
+                .options(defer(User.password))
                 .where(User.username == username)
                 .options(selectinload(User.companies))
             )
@@ -55,3 +69,29 @@ class UserDAO:
                 .options(selectinload(User.companies))
             )
             return user.scalars().first()
+
+    @classmethod
+    async def test_case(cls):
+        async with async_session_maker() as session:
+            query = select(
+                User,
+                case(
+                    (User.username == "humoyun209", "admin"),
+                    (User.username == "django", "user"),
+                    else_="None",
+                ),
+            )
+            result = await session.execute(query)
+            res = result.fetchone()
+            return {"user": res[0], "role": res[1]}
+
+
+class ResumeDAO(BaseDAO):
+    @classmethod
+    async def create_resume(cls, **kwargs):
+        async with async_session_maker() as session:
+            resume = await session.execute(
+                insert(Resume).values(**kwargs).returning(Resume)
+            )
+            await session.commit()
+            return resume.scalars().first()

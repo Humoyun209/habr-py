@@ -1,8 +1,8 @@
 """Initial
 
-Revision ID: a46ba5625b1a
+Revision ID: dd6a772f4aae
 Revises: 
-Create Date: 2024-02-18 21:50:35.373176
+Create Date: 2024-02-22 15:43:53.524539
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a46ba5625b1a'
+revision: str = 'dd6a772f4aae'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -56,7 +56,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('resume',
-    sa.Column('id', sa.String(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('photo', sa.String(), nullable=True),
     sa.Column('first_name', sa.String(length=50), nullable=False),
     sa.Column('last_name', sa.String(length=50), nullable=False),
@@ -66,8 +66,8 @@ def upgrade() -> None:
     sa.Column('salary', sa.Numeric(), nullable=True),
     sa.Column('connect_link', sa.String(), nullable=True),
     sa.Column('connect_type', sa.Enum('LINKEDIN', 'TELEGRAM', 'VK', 'FACEBOOK', name='connecttype'), nullable=True),
-    sa.Column('workload', sa.Enum('FULL_TIME', 'PART_TIME', name='workload'), nullable=False),
-    sa.Column('level', sa.Enum('INTERN', 'JUNIOR', 'MIDDLE', 'SENIOR', 'LEAD', name='level'), nullable=False),
+    sa.Column('workload', sa.Enum('FULL_TIME', 'PART_TIME', name='workload'), nullable=True),
+    sa.Column('level', sa.Enum('INTERN', 'JUNIOR', 'MIDDLE', 'SENIOR', 'LEAD', name='level'), nullable=True),
     sa.Column('birthday', sa.DateTime(), nullable=True),
     sa.Column('sex', sa.Integer(), nullable=False),
     sa.Column('is_remote', sa.Boolean(), nullable=False),
@@ -77,7 +77,7 @@ def upgrade() -> None:
     )
     op.create_table('cities_resumes',
     sa.Column('city_id', sa.Integer(), nullable=False),
-    sa.Column('resume_id', sa.String(), nullable=False),
+    sa.Column('resume_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['city_id'], ['city.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['resume_id'], ['resume.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('city_id', 'resume_id')
@@ -98,7 +98,7 @@ def upgrade() -> None:
     )
     op.create_table('tags_resumes',
     sa.Column('tag_id', sa.Integer(), nullable=False),
-    sa.Column('resume_id', sa.String(), nullable=False),
+    sa.Column('resume_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['resume_id'], ['resume.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['tag_id'], ['tag.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('tag_id', 'resume_id')
@@ -122,7 +122,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('responses',
-    sa.Column('resume_id', sa.String(), nullable=False),
+    sa.Column('resume_id', sa.Integer(), nullable=False),
     sa.Column('vacancy_id', sa.Integer(), nullable=False),
     sa.Column('cover_letter', sa.String(length=3000), nullable=False),
     sa.Column('created', sa.DateTime(), server_default=sa.text("TIMEZONE('utc', now())"), nullable=False),
