@@ -8,6 +8,8 @@ from pydantic import (
     field_validator,
 )
 
+from app.users.enums import ConnectType, Level, WorkLoad
+
 
 class UserScheme(BaseModel):
     username: str
@@ -33,6 +35,11 @@ class ProfileUser(BaseModel):
     email: EmailStr
 
 
+class TokenModel(BaseModel):
+    access_token: str
+    token_type: str
+
+
 class BaseResume(BaseModel):
     first_name: str
     last_name: str
@@ -56,7 +63,27 @@ class BaseResume(BaseModel):
         if resume.sex not in [0, 1]:
             raise ValidationError("Sex should be 0 and 1")
         return resume
-    
 
-class ResumeSchema(BaseModel):
-    
+
+class ResumeSchema(BaseResume):
+    tags: list[int]
+    connect_type: ConnectType | None
+    connect_link: str | None
+    workload: WorkLoad
+    level: Level
+    is_remote: bool
+    cities: list[int]
+
+    @field_validator("tags", mode="before")
+    def validate_birthday(cls, value: list[int]):
+        if len(value) < 4:
+            raise ValidationError("Укажите минимум 4 навыка")
+        return value
+
+    @model_validator(mode="after")
+    def validate(cls, resume: "ResumeSchema"):
+        if all([resume.connect_type, resume.connect_link]) or all(
+            [not resume.connect_type, not resume.connect_link]
+        ):
+            return resume
+        return resume

@@ -1,30 +1,30 @@
-import json
-import secrets
 from typing import Annotated, Any
-import uuid
+
 from fastapi import (
     APIRouter,
-    Cookie,
     Depends,
-    Form,
     HTTPException,
-    Header,
     Path,
-    Request,
-    Response,
     status,
 )
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from app.companies.dao import CompanyDAO
+from fastapi.security import OAuth2PasswordBearer
 
 from app.users.dao import ResumeDAO, UserDAO
 from app.users.auth import authenticate_user, create_access_token
 from app.users.dependencies import get_current_user
 from app.users.models import Resume
-from app.users.schemas import BaseResume, UserLogin, UserScheme, ProfileUser
+from app.users.schemas import (
+    BaseResume,
+    ResumeSchema,
+    UserLogin,
+    UserScheme,
+    ProfileUser,
+)
 from passlib.hash import pbkdf2_sha256
 
+
 router = APIRouter(prefix="/users", tags=["Пользователи"])
+oauth2_scheme = OAuth2PasswordBearer("/users/login")
 
 
 @router.get("/list", status_code=200)
@@ -89,6 +89,10 @@ async def get_resume(
 
 @router.patch("/resume/edit", status_code=204)
 async def resume_edit(
-    resume_data: ResumeSchema,
-    Annotated
-)
+    resume_data: ResumeSchema, user: Annotated[ProfileUser, Depends(get_current_user)]
+):
+
+    resume = await ResumeDAO.update_resume(
+        resume_data.model_dump() | {"user_id": user.id}
+    )
+    return resume
